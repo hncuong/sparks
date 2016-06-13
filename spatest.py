@@ -14,8 +14,9 @@ def adid(url):
 def lineStrip(line):
   sline = line.split("\t")
   guid = sline[14]
-  woc = sline[11]
-  aid = adid(sline[10])
+  woc = 1
+#  woc =
+  aid = adid(sline[10]) + "\t"
   return (guid, (woc, aid))
 
 
@@ -27,8 +28,10 @@ def main():
   sc = SparkContext(appName = "User click")
   lines = sc.textFile(ADCPC)
   mclines = lines.filter(lambda line: "muachung.vn" in line)
+  print(mclines.count())
   mclines = mclines.map(lineStrip)
-  mclines.reduceByKey(lambda x,y: (x[0] + y[0], x[1].append(y[1])))
+  mclines = mclines.reduceByKey(lambda x,y: (x[0] + y[0], x[1] + y[1]))
+  print(mclines.count())
   output = mclines.take(10)
 #  woc = 1
 #  print(mclines.first())
